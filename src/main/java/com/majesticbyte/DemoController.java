@@ -1,5 +1,6 @@
 package com.majesticbyte;
 
+import com.majesticbyte.model.User;
 import com.majesticbyte.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -15,7 +16,10 @@ public class DemoController {
 
     @RequestMapping("/")
     public String index() {
-        
-        return "Greetings from Spring Boot! "+userRepository.toString();
+        User newUser = new User();
+        newUser.setUsername("TestUser");
+        newUser = userRepository.save(newUser);
+        User userInrepo = userRepository.findById(1L).orElseThrow();
+        return "Greetings from Spring Boot! "+ newUser.toString() + " :: " +userInrepo.toString();
     }
 }
