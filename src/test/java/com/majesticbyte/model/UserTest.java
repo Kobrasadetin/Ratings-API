@@ -11,7 +11,7 @@ public class UserTest {
 
     @Test
     public void userCreationTest() throws Exception{
-        User newUser = new User();
+        AppUser newUser = new AppUser();
         newUser.setUsername("TestUser");
         assertEquals("TestUser", newUser.getUsername());
     }

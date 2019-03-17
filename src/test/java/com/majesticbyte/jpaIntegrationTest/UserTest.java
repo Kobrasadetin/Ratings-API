@@ -1,6 +1,6 @@
 package com.majesticbyte.jpaIntegrationTest;
 
-import com.majesticbyte.model.User;
+import com.majesticbyte.model.AppUser;
 import com.majesticbyte.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,11 +22,11 @@ public class UserTest {
 
     @Test
     public void userCreationTest() throws Exception{
-        User newUser = new User();
+        AppUser newUser = new AppUser();
         newUser.setUsername("TestUser");
         assertNotEquals(java.util.Optional.of(1L), newUser.getId());
-        User savedUser = userRepository.save(newUser);
-        List<User> usersInrepo = userRepository.findByUsername("TestUser");
+        AppUser savedUser = userRepository.save(newUser);
+        List<AppUser> usersInrepo = userRepository.findByUsername("TestUser");
 
         assertEquals("TestUser", usersInrepo.get(0).getUsername());
         assertEquals(savedUser, usersInrepo.get(0));
