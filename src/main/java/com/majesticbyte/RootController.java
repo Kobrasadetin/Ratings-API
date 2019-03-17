@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
-public class DemoController {
+public class RootController {
 
     @NonNull
     UserRepository userRepository;
 
-    @RequestMapping("/demo/")
+    @RequestMapping("/root/")
     public String index() {
         AppUser newUser = new AppUser();
         newUser.setUsername("TestUser");

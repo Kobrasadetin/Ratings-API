@@ -2,8 +2,10 @@ package com.majesticbyte.security;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.text.RandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,6 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.apache.commons.text.CharacterPredicates.LETTERS;
+
 
 @Order(99)
 @EnableWebSecurity
@@ -57,8 +62,20 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    @Profile({"!test"})
     @Bean
     public JwtConfig jwtConfig() {
+        return new JwtConfig();
+    }
+
+    @Profile({"test"})
+    @Bean
+    public JwtConfig jwtConfigTest() {
+        RandomStringGenerator generator = new RandomStringGenerator.Builder()
+                .withinRange('0', 'z')
+                .build();
+        JwtConfig jwtConfig = new JwtConfig();
+        jwtConfig.setSecret( generator.generate(12) );
         return new JwtConfig();
     }
 

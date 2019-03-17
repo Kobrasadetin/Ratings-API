@@ -10,6 +10,8 @@ import javax.persistence.Id;
 @Entity
 public class AppUser {
 
+    public static final String ROLE_ADMIN = "ADMIN";
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
