@@ -3,7 +3,6 @@ package com.majesticbyte.integrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.majesticbyte.Application;
 import com.majesticbyte.model.AppUser;
-import com.majesticbyte.repository.UserRepository;
 import com.majesticbyte.service.AppUserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,16 +15,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
+import javax.transaction.Transactional;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-        classes = Application.class)
+       classes = Application.class)
+@Transactional
 @AutoConfigureMockMvc
 public class SecurityIT {
 
@@ -38,11 +39,11 @@ public class SecurityIT {
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
 
-    /*@Before
+    @Before
     public void createAdmin(){
-        AppUser user = AppUser.withProperties(0L,"admin", "password", AppUser.ROLE_ADMIN);
-        userRepository.save(user);
-    }*/
+        AppUser user = AppUser.withProperties(0L,"admin","password", AppUser.ROLE_ADMIN);
+        userService.createUser(user);
+    }
 
     @Test
     public void givenUserNotLoggedInResponseIsUnauthorized() throws Exception {
@@ -52,10 +53,21 @@ public class SecurityIT {
     }
 
     @Test
+    public void givenUserGivesWrongPasswordResponseIsUnauthorized() throws Exception {
+        mvc.perform(post("/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "\t\"username\": \"admin\",\n" +
+                        "\t\"password\": \"wrongpassword\"\n" +
+                        "}"))
+                .andExpect(status().isUnauthorized())
+                .andReturn();
+    }
+
+    @Test
     public void givenUserLogsInUserCanQueryApi() throws Exception {
         MvcResult result;
-        AppUser user = AppUser.withProperties(0L,"admin","password", AppUser.ROLE_ADMIN);
-        userService.createUser(user);
+
         result = mvc.perform(post("/auth")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
