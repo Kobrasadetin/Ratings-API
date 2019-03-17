@@ -5,6 +5,7 @@ import com.majesticbyte.Application;
 import com.majesticbyte.model.AppUser;
 import com.majesticbyte.service.AppUserService;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest(
-       classes = Application.class)
+        classes = Application.class)
 @Transactional
 @AutoConfigureMockMvc
-public class SecurityIT {
+public class UserGroupIT {
 
     @Autowired
     private AppUserService userService;
@@ -41,49 +42,25 @@ public class SecurityIT {
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
 
+    private String adminToken;
+
+    private String userToken;
+
     @Before
-    public void createAdmin(){
-        AppUser user = AppUser.adminWithProperties("admin","password");
+    public void initialize() throws Exception{
+        AppUser user = AppUser.userWithProperties("user", "password");
+        AppUser admin = AppUser.adminWithProperties("admin", "password");
         userService.createUser(user);
+        userService.createUser(admin);
+        userToken = authenticate(user);
+        adminToken = authenticate(admin);
     }
 
     @Test
-    public void givenUserNotLoggedInResponseIsUnauthorized() throws Exception {
-        mvc.perform(get("/")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void givenUserGivesWrongPasswordResponseIsUnauthorized() throws Exception {
-        mvc.perform(post("/auth")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "\t\"username\": \"admin\",\n" +
-                        "\t\"password\": \"wrongpassword\"\n" +
-                        "}"))
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }
-
-    @Test
-    public void givenUserLogsInUserCanQueryApi() throws Exception {
-        MvcResult result;
-
-        result = mvc.perform(post("/auth")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "\t\"username\": \"admin\",\n" +
-                        "\t\"password\": \"password\"\n" +
-                        "}"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String jwtToken = result.getResponse().getHeader("Authorization");
-
+    public void givenUserLogsInUserCanCreateGroup() throws Exception {
         mvc.perform(get("/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", jwtToken))
+                .header("Authorization", userToken))
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .contentTypeCompatibleWith(new MediaType("application", "*+json")));
@@ -95,6 +72,19 @@ public class SecurityIT {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String authenticate(AppUser user) throws Exception {
+        MvcResult result = mvc.perform(post("/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\n" +
+                        "\t\"username\": \"" + user.getUsername() + "\",\n" +
+                        "\t\"password\": \"password\"\n" +
+                        "}"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        return result.getResponse().getHeader("Authorization");
     }
 
 }

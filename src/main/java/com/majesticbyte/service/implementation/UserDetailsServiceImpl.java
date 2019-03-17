@@ -28,7 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        // hard coding the users. All passwords must be encoded.
         Optional<AppUser> appUser = userRepository.findOneByUsername(username);
 
         if(appUser.isPresent()) {

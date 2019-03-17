@@ -15,9 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.apache.commons.text.CharacterPredicates.LETTERS;
 
 
 @Order(99)
@@ -26,6 +25,9 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -59,7 +61,7 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
     // In addition, we need to define the password encoder also. So, auth manager can compare and verify passwords.
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Profile({"!test"})
@@ -69,18 +71,14 @@ public class SecurityCredentialsConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Profile({"test"})
-    @Bean
+    @Bean(name = "jwtConfig")
     public JwtConfig jwtConfigTest() {
         RandomStringGenerator generator = new RandomStringGenerator.Builder()
                 .withinRange('0', 'z')
                 .build();
         JwtConfig jwtConfig = new JwtConfig();
         jwtConfig.setSecret( generator.generate(12) );
-        return new JwtConfig();
+        return jwtConfig;
     }
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }
