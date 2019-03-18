@@ -1,23 +1,21 @@
-package com.majesticbyte.service.implementation;
+package com.majesticbyte.security.service.implementation;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import com.majesticbyte.model.AppUser;
 import com.majesticbyte.repository.UserRepository;
+import com.majesticbyte.security.model.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService  {
+public class AppUserDetailsServiceImpl implements AppUserDetailsService  {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
@@ -39,7 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService  {
 
             // The "User" class is provided by Spring and represents a model class for user to be returned by UserDetailsService
             // And used by auth manager to verify and check user authentication.
-            return new User(appUser.get().getUsername(), appUser.get().getPassword(), grantedAuthorities);
+            return new AuthenticatedUser(appUser.get(), grantedAuthorities);
         }
 
         // If user not found. Throw this exception.

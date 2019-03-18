@@ -2,12 +2,16 @@ package com.majesticbyte.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class AppUser {
 
@@ -30,8 +34,11 @@ public class AppUser {
 
     private String role;
 
-    @ManyToMany(mappedBy = "members")
-    private Set<UserGroup> groups;
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private Set<UserGroup> groups = new HashSet<>();
+
+    @ManyToMany(mappedBy = "admins", fetch = FetchType.LAZY)
+    private Set<UserGroup> adminInGroups = new HashSet<>();
 
 
     public static AppUser adminWithProperties(String username, String password) {

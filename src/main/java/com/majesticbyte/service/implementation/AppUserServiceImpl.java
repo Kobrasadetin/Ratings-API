@@ -3,6 +3,7 @@ package com.majesticbyte.service.implementation;
 import com.majesticbyte.model.AppUser;
 import com.majesticbyte.repository.UserRepository;
 import com.majesticbyte.service.AppUserService;
+import com.majesticbyte.util.SecurityContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
+
+    public static int USER_GROUP_LIMIT = 10;
 
     @Autowired
     private UserRepository userRepository;
@@ -36,5 +39,15 @@ public class AppUserServiceImpl implements AppUserService {
             }
         }
         createUser(AppUser.adminWithProperties(username, password));
+    }
+
+    @Override
+    public AppUser getAuthenticatedUser() {
+        return userRepository.findOneByUsername(SecurityContextUtil.username()).orElseThrow();
+    }
+
+    @Override
+    public boolean groupLimitReached(AppUser user) {
+        return user.getGroups().size() >= USER_GROUP_LIMIT;
     }
 }

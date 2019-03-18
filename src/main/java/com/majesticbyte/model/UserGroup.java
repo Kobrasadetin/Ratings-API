@@ -1,11 +1,15 @@
 package com.majesticbyte.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class UserGroup {
 
@@ -13,15 +17,15 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "group_members",
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private Set<AppUser> members;
+    private Set<AppUser> members = new HashSet<>();
 
-    @OneToMany
-    private Set<AppUser> admins;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<AppUser> admins = new HashSet<>();
 
     private String name;
 }

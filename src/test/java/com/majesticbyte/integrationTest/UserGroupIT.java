@@ -58,7 +58,7 @@ public class UserGroupIT {
 
     @Test
     public void givenUserLogsInUserCanCreateGroup() throws Exception {
-        mvc.perform(get("/")
+        mvc.perform(post("/groups")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", userToken))
                 .andExpect(status().isOk())
