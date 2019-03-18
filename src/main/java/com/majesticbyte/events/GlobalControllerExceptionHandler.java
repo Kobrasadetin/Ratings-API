@@ -3,6 +3,7 @@ package com.majesticbyte.events;
 import com.majesticbyte.exceptions.AppConstraintException;
 import com.majesticbyte.exceptions.ExceptionMessage;
 import org.springframework.data.rest.webmvc.RepositoryRestExceptionHandler;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
+
 
 @ControllerAdvice(basePackageClasses = RepositoryRestExceptionHandler.class)
 public class GlobalControllerExceptionHandler {

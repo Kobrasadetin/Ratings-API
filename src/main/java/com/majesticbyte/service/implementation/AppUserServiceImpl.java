@@ -1,5 +1,6 @@
 package com.majesticbyte.service.implementation;
 
+import com.majesticbyte.configuration.ApplicationSettings;
 import com.majesticbyte.model.AppUser;
 import com.majesticbyte.repository.UserRepository;
 import com.majesticbyte.service.AppUserService;
@@ -22,6 +23,9 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
+
+    @Autowired
+    private ApplicationSettings applicationSettings;
 
     @Override
     public AppUser createUser(AppUser userDetails) {
@@ -48,6 +52,11 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public boolean groupLimitReached(AppUser user) {
-        return user.getGroups().size() >= USER_GROUP_LIMIT;
+        return user.getGroups().size() >= applicationSettings.getGroupLimit();
+    }
+
+    @Override
+    public AppUser save(AppUser appUser) {
+        return userRepository.save(appUser);
     }
 }

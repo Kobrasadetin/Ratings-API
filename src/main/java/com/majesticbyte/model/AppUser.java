@@ -34,7 +34,11 @@ public class AppUser {
 
     private String role;
 
-    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "group_members",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
     private Set<UserGroup> groups = new HashSet<>();
 
     @ManyToMany(mappedBy = "admins", fetch = FetchType.LAZY)
