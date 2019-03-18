@@ -24,22 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@ActiveProfiles("test")
-@SpringBootTest(
-       classes = Application.class)
-@Transactional
-@AutoConfigureMockMvc
-public class SecurityIT {
-
-    @Autowired
-    private AppUserService userService;
-
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    BCryptPasswordEncoder passwordEncoder;
+public class SecurityIT extends IntegrationTestTemplate{
 
     @Before
     public void createAdmin(){
@@ -87,14 +72,6 @@ public class SecurityIT {
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .contentTypeCompatibleWith(new MediaType("application", "*+json")));
-    }
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

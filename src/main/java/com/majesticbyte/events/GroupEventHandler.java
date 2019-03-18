@@ -9,6 +9,7 @@ import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 
 import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @RepositoryEventHandler
@@ -23,15 +24,21 @@ public class GroupEventHandler {
     }
 
     @HandleBeforeCreate
-    public void handleGroupBeforeCreate(UserGroup userGroup) throws GroupLimitReachedException{
+    public void handleGroupBeforeCreate(UserGroup userGroup) throws GroupLimitReachedException {
         AppUser authenticatedUser = appUserService.getAuthenticatedUser();
-        if (appUserService.groupLimitReached(authenticatedUser)){
+        if (appUserService.groupLimitReached(authenticatedUser)) {
             throw new GroupLimitReachedException("group limit reached");
         }
-        userGroup.getAdmins().add(authenticatedUser);
-        userGroup.getMembers().add(authenticatedUser);
-        logger.info("handleGroupBeforeCreate: "+userGroup.toString());
-        logger.info("security name: "+ authenticatedUser.getUsername());
+        addUserIfNotPresent(authenticatedUser, userGroup.getAdmins());
+        addUserIfNotPresent(authenticatedUser, userGroup.getMembers());
+        logger.info("handleGroupBeforeCreate: " + userGroup.toString());
+        logger.info("security name: " + authenticatedUser.getUsername());
+    }
+
+    private void addUserIfNotPresent(AppUser authenticatedUser, Set<AppUser> userSet) {
+        if (!userSet.contains(authenticatedUser)) {
+            userSet.add(authenticatedUser);
+        }
     }
 
 }

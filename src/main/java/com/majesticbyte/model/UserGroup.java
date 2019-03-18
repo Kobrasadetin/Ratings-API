@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,5 +28,10 @@ public class UserGroup {
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<AppUser> admins = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "match_record_id")
+    private Set<MatchRecord> matchRecords = new HashSet<>();
+
+    @NotNull
     private String name;
 }

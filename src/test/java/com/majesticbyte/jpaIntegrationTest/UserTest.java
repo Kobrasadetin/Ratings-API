@@ -27,8 +27,7 @@ public class UserTest {
 
     @Test
     public void userCreationTest() throws Exception{
-        AppUser newUser = new AppUser();
-        newUser.setUsername("TestUser");
+        AppUser newUser = AppUser.userWithProperties("TestUser", "TestPassword");
         assertNotEquals(java.util.Optional.of(1L), newUser.getId());
         AppUser savedUser = userRepository.save(newUser);
         List<AppUser> usersInrepo = userRepository.findByUsername("TestUser");
