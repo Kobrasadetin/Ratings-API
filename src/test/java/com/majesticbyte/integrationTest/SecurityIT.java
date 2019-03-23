@@ -1,5 +1,6 @@
 package com.majesticbyte.integrationTest;
 
+import com.jayway.jsonpath.JsonPath;
 import com.majesticbyte.model.AppUser;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +52,8 @@ public class SecurityIT extends IntegrationTestTemplate{
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String jwtToken = result.getResponse().getHeader("Authorization");
+        //String jwtToken = result.getResponse().getHeader("Authorization");
+        String jwtToken = JsonPath.parse(result.getResponse().getContentAsString()).read("$.jwtToken");
 
         mvc.perform(get("/")
                 .contentType(MediaType.APPLICATION_JSON)

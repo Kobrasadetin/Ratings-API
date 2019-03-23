@@ -8,6 +8,9 @@ public class JwtConfig {
     @Value("${ratings-api.security.jwt.uri:/auth/**}")
     private String Uri;
 
+    @Value("${ratings-api.security.jwt.json-key:jwtToken}")
+    private String jsonKey;
+
     @Value("${ratings-api.security.jwt.header:Authorization}")
     private String header;
 

@@ -51,6 +51,7 @@ public abstract class IntegrationTestTemplate {
 
     public String authenticate(AppUser user) throws Exception {
         MvcResult result = mvc.perform(post("/auth")
+                .param("jwt-in-header", "true")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
                         "\t\"username\": \"" + user.getUsername() + "\",\n" +
