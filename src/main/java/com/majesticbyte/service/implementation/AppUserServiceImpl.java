@@ -6,12 +6,8 @@ import com.majesticbyte.repository.UserRepository;
 import com.majesticbyte.service.AppUserService;
 import com.majesticbyte.util.SecurityContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
@@ -38,7 +34,7 @@ public class AppUserServiceImpl implements AppUserService {
     public void addAdminIfNoAdmins(String username, String password) {
         Iterable<AppUser> users = userRepository.findAll();
         for (AppUser user : users) {
-            if (user.getRole().equals(AppUser.ROLE_ADMIN)) {
+            if (userIsAdmin(user)) {
                 return;
             }
         }
@@ -58,5 +54,10 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public AppUser save(AppUser appUser) {
         return userRepository.save(appUser);
+    }
+
+    @Override
+    public boolean userIsAdmin(AppUser authenticatedUser) {
+        return authenticatedUser.getRole().equals(AppUser.ROLE_ADMIN);
     }
 }

@@ -13,4 +13,6 @@ public interface AppUserService {
     boolean groupLimitReached(AppUser user);
 
     AppUser save(AppUser appUser);
+
+    boolean userIsAdmin(AppUser authenticatedUser);
 }

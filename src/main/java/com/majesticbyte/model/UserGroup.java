@@ -18,13 +18,24 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToMany(mappedBy = "groups")
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "group_members",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
     private Set<AppUser> members = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne
+    private AppUser creator;
+
+    @ManyToMany(cascade ={CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "group_admins",
+            joinColumns = @JoinColumn(name = "admin_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
     private Set<AppUser> admins = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "match_record_id")
     private Set<MatchRecord> matchRecords = new HashSet<>();
 

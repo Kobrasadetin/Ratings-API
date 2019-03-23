@@ -34,15 +34,14 @@ public class AppUser {
 
     private String role;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "group_members",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id"))
+    @ManyToMany(mappedBy = "members", cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     private Set<UserGroup> groups = new HashSet<>();
 
-    @ManyToMany(mappedBy = "admins", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "admins")
     private Set<UserGroup> adminInGroups = new HashSet<>();
+
+    @OneToMany(mappedBy = "admins")
+    private Set<UserGroup> createdGroups = new HashSet<>();
 
 
     public static AppUser adminWithProperties(String username, String password) {

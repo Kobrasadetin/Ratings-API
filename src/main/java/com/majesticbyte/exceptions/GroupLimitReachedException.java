@@ -1,7 +1,7 @@
 package com.majesticbyte.exceptions;
 
-public class GroupLimitReachedException extends AppConstraintException {
-    public GroupLimitReachedException(String message){
+public class GroupLimitReachedException extends AppOperationException {
+    public GroupLimitReachedException(ExceptionMessage message){
         super(message);
     }
 }

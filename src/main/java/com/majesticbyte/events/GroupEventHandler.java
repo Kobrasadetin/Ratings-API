@@ -1,20 +1,19 @@
 package com.majesticbyte.events;
 
+import com.majesticbyte.exceptions.ExceptionMessage;
 import com.majesticbyte.exceptions.GroupLimitReachedException;
+import com.majesticbyte.exceptions.UnauthorizedOperationException;
 import com.majesticbyte.model.AppUser;
 import com.majesticbyte.model.UserGroup;
 import com.majesticbyte.repository.UserGroupRepository;
-import com.majesticbyte.repository.UserRepository;
 import com.majesticbyte.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.core.annotation.HandleAfterCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
+import org.springframework.data.rest.core.annotation.HandleBeforeDelete;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
-import java.util.Set;
 import java.util.logging.Logger;
 
 @RepositoryEventHandler
@@ -38,24 +37,29 @@ public class GroupEventHandler {
     public void handleGroupBeforeCreate(UserGroup userGroup) throws GroupLimitReachedException {
         AppUser authenticatedUser = appUserService.getAuthenticatedUser();
         if (appUserService.groupLimitReached(authenticatedUser)) {
-            throw new GroupLimitReachedException("group limit reached");
+            throw new GroupLimitReachedException(new ExceptionMessage("group limit reached"));
         }
-        logger.info("handleGroupBeforeCreate: " + userGroup.toString());
+        setCreatorCredentials(authenticatedUser, userGroup);
+        logger.info("user "+authenticatedUser.getUsername()+ " created group " + userGroup.getName());
     }
-    @HandleAfterCreate
-    public void handleGroupAfterCreate(UserGroup userGroup) throws GroupLimitReachedException {
+
+    @HandleBeforeDelete
+    public void handleGroupBeforeDelete(UserGroup userGroup) throws UnauthorizedOperationException {
         AppUser authenticatedUser = appUserService.getAuthenticatedUser();
-
-        addUserIfNotPresent(authenticatedUser, userGroup);
-        appUserService.save(authenticatedUser);
-        logger.info("handleGroupAfterCreate: " + userGroup.toString());
-        logger.info("security name: " + authenticatedUser.getUsername());
+        if (!userGroup.getAdmins().contains(authenticatedUser)) {
+            throw new UnauthorizedOperationException();
+        }
+        logger.info("user "+authenticatedUser.getUsername()+ " deleted group " + userGroup.getName());
     }
 
 
-    private void addUserIfNotPresent(AppUser authenticatedUser, UserGroup userGroup) {
-        authenticatedUser.getGroups().add(userGroup);
-        authenticatedUser.getAdminInGroups().add(userGroup);
+    private void setCreatorCredentials(AppUser authenticatedUser, UserGroup userGroup) {
+        userGroup.setCreator(authenticatedUser);
+        userGroup.getMembers().add(authenticatedUser);
+        userGroup.getAdmins().add(authenticatedUser);
+        //authenticatedUser.getCreatedGroups().add(userGroup);
+        //authenticatedUser.getGroups().add(userGroup);
+        //authenticatedUser.getAdminInGroups().add(userGroup);
     }
 
 }

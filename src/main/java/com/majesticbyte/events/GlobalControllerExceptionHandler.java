@@ -1,9 +1,8 @@
 package com.majesticbyte.events;
 
-import com.majesticbyte.exceptions.AppConstraintException;
+import com.majesticbyte.exceptions.AppOperationException;
 import com.majesticbyte.exceptions.ExceptionMessage;
 import org.springframework.data.rest.webmvc.RepositoryRestExceptionHandler;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,9 +20,9 @@ public class GlobalControllerExceptionHandler {
 
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(AppConstraintException.class)
+    @ExceptionHandler(AppOperationException.class)
     @ResponseBody
-    public ExceptionMessage badRequest(HttpServletRequest req, AppConstraintException exception) {
+    public ExceptionMessage badRequest(HttpServletRequest req, AppOperationException exception) {
         ExceptionMessage response = new ExceptionMessage(exception.getLocalizedMessage());
         return response;
     }
